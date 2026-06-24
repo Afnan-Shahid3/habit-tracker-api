@@ -13,7 +13,33 @@ from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
+@api_view(['POST'])
+def login_api(request):
+    try:
+
+        data = request.data
+        username = data.get('username')
+        password = data.get('password')
+        user = authenticate(username = username, password = password)
+        if user:
+            token = Token.objects.get_or_create(user = user)
+            return Response({'status' : 200, 'token' : str(token)})
+
+        return Response({'status' : 300, 'message' : "Invalid Credentials"})
+
+    except Exception as e:
+        print(e)
+    return Response({
+        'status' : 400,
+        'message': "Something went wrong"
+    })
+
+
 class HabitModelViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    
     serializer_class = HabitSerializer
 
     def get_queryset(self):
@@ -25,9 +51,12 @@ class HabitModelViewSet(viewsets.ModelViewSet):
 
 
 class HabitLogModelViewSet(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     serializer_class = HabitLogSerializer
 
     def get_queryset(self):
-        return HabitLog.objects.filter(habitlogs__habits__user = self.request.user)
+        return HabitLog.objects.filter(habit__user = self.request.user)
 
 

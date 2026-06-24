@@ -10,5 +10,5 @@ router.register('habitlogs', views.HabitLogModelViewSet, basename = 'habitlogs')
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    
+    path('login/', views.login_api)
 ]
