@@ -11,10 +11,15 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
 
 from django_filters.rest_framework import DjangoFilterBackend
 
 # Create your views here.
+
+class CustomPage(PageNumberPagination):
+    page_size = 3
+    max_page_size = 5
 
 @api_view(['POST'])
 def login_api(request):
@@ -57,6 +62,8 @@ class HabitModelViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user = self.request.user)
 
+    pagination_class = CustomPage
+
 
 
 class HabitLogModelViewSet(viewsets.ModelViewSet):
@@ -70,5 +77,7 @@ class HabitLogModelViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return HabitLog.objects.filter(habit__user = self.request.user)
+
+    pagination_class = CustomPage
 
 
