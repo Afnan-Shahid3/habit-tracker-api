@@ -5,7 +5,7 @@ from .models import Habit, HabitLog
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes, action
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -63,6 +63,22 @@ class HabitModelViewSet(viewsets.ModelViewSet):
         serializer.save(user = self.request.user)
 
     pagination_class = CustomPage
+
+    @action(detail = False, methods = ['GET'])
+    def summary(self, request):
+        habits = self.get_queryset()  # returns all habits for this user
+    
+        total_habits = habits.count()
+        total_logs = HabitLog.objects.filter(habit__user=request.user).count()
+        completed_logs = HabitLog.objects.filter(habit__user=request.user, completed=True).count()
+        
+        return Response({
+            'total_habits': total_habits,
+            'total_logs': total_logs,
+            'completed_logs': completed_logs,
+        })
+
+    
 
 
 
