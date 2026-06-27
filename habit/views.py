@@ -10,6 +10,9 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.filters import SearchFilter, OrderingFilter
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 # Create your views here.
 
@@ -42,6 +45,12 @@ class HabitModelViewSet(viewsets.ModelViewSet):
     
     serializer_class = HabitSerializer
 
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+    filterset_fields = ['frequency']
+    search_fields = ['name']
+    ordering_fields = ['created_at']
+
     def get_queryset(self):
         return Habit.objects.filter(user = self.request.user)
 
@@ -55,6 +64,9 @@ class HabitLogModelViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     serializer_class = HabitLogSerializer
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['completed', 'date']
 
     def get_queryset(self):
         return HabitLog.objects.filter(habit__user = self.request.user)

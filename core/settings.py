@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'habit',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
 
 ]
 
